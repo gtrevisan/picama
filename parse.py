@@ -143,7 +143,12 @@ def main():
     # parse html
     soup = bs4.BeautifulSoup(html, "html.parser")
     calls = soup.find("div", id="myCalls")
-    jobs = calls.find_all("div", class_="col-xs-12")
+
+    # sanity check
+    if calls:
+        jobs = calls.find_all("div", class_="col-xs-12")
+    elif soup.find("h1").get_text() == "Non ci sono bandi":
+        jobs = []
 
     # start building feed
     print('<rss version="2.0"><channel>')
