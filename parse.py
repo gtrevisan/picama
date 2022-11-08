@@ -70,9 +70,12 @@ def parse_job(job):
     data = [val.get_text().strip(" ") for val in cdata]
 
     # parse date
-    if cdata[0].find("i").get("class")[-1] == "glyphicon-th":
-        begin = until = "N/A"
+    if len(data) == 1:
+        begin = until = None
         categ = data[0]
+    elif len(data) == 2:
+        begin, until = data
+        categ = None
     else:
         begin, until, categ = data
 
@@ -93,7 +96,8 @@ def parse_job(job):
         descr += "\n"
         descr += "<b>From:</b> " + begin + "\n"
         descr += "<b>To:</b> " + until + "\n"
-    descr += "<b>Category:</b> " + categ + "\n"
+    if categ:
+        descr += "<b>Category:</b> " + categ + "\n"
     if details:
         descr += str(details)
 
