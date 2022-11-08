@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "picama"
+version = "0.1.0"
+description = "Piattaforma Integrata Concorsi Atenei Magicamente Automatizzata"
+authors = ["gtrevisan <gtrevisan@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+beautifulsoup4 = "^4.11.1"
+requests = "^2.28.1"
+lxml = "^4.9.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+pylint = "^2.15.5"
+yamllint = "^1.28.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
