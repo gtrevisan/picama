@@ -1,0 +1,57 @@
+---
+
+name: lint
+# yamllint disable-line rule:truthy
+on:
+  push:
+  pull_request:
+
+jobs:
+
+
+  pylint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pip3 install -U pip poetry
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Run Pylint
+        run: poetry run pylint *.py
+
+
+  black:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+
+
+  yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install yamllint
+        run: pip3 install yamllint
+
+      - name: Run yamllint
+        run: |
+          find "$PWD" -type f -name '*.yml' \
+          | xargs yamllint
