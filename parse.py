@@ -81,8 +81,9 @@ def parse_job(job):
 
     # fetch details
     link = URL + href
-    print(link, file=sys.stderr)
+    print(link, file=sys.stderr, end="\t")
     result = requests.get(link, timeout=9)
+    print(result.status_code, file=sys.stderr)
 
     # parse details
     further = bs4.BeautifulSoup(result.content, "html.parser")
@@ -119,6 +120,7 @@ def main():
     main function
     """
 
+    repo = "https://github.com/gtrevisan/picama"
     inst = os.environ["INST"]
     new_html = inst + ".htm"
 
@@ -135,9 +137,10 @@ def main():
     else:
 
         # fetch
-        full = URL + "/" + inst
-        print(full, file=sys.stderr)
-        result = requests.get(full, timeout=9)
+        full = URL + "/" + inst + "/"
+        print(full, file=sys.stderr, end="\t")
+        result = requests.get(full, allow_redirects=False, timeout=9)
+        print(result.status_code, file=sys.stderr)
 
         # read and cache
         html = result.content
@@ -151,8 +154,13 @@ def main():
     # sanity check
     if calls:
         jobs = calls.find_all("div", class_="col-xs-12")
+        errmsg = None
+    elif URL + "/login" in str(html):
+        jobs = []
+        errmsg = "Login required"
     elif soup.find("h1").get_text() == "Non ci sono bandi":
         jobs = []
+        errmsg = "No open positions"
 
     # start building feed
     print('<rss version="2.0"><channel>')
@@ -160,6 +168,13 @@ def main():
     print(
         "<lastBuildDate>" + datetime.datetime.now().strftime("%c") + "</lastBuildDate>"
     )
+
+    # no jobs
+    if not jobs:
+        print("<item>", end="")
+        print(tag("title", errmsg), end="")
+        print(tag("link", repo + "/issues/new"), end="")
+        print("</item>")
 
     # for each job
     for job in jobs:

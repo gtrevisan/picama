@@ -21,9 +21,12 @@ def main():
 
     url = "https://pica.cineca.it"
 
-    print(url, file=sys.stderr)
+    # request
+    print(url, file=sys.stderr, end="\t")
     result = requests.get(url, timeout=9)
+    print(result.status_code, file=sys.stderr)
 
+    # parser
     soup = bs4.BeautifulSoup(result.content, "html.parser")
     items = soup.find_all("div", class_="card-container")
     insts = {}
