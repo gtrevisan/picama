@@ -1,0 +1,110 @@
+---
+
+name: build
+# yamllint disable-line rule:truthy
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '45 17 * * *'
+
+jobs:
+
+
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pip3 install -U pip poetry
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install --without dev
+
+      - name: Build matrix
+        id: set-matrix
+        run: poetry run ./matrix.py >> "$GITHUB_OUTPUT"
+
+      - name: Build readme
+        run: poetry run ./readme.py > README.md
+
+      - name: Compare readme
+        run: |
+          git diff --quiet --exit-code README.md && DIFF=0 || DIFF=1
+          echo "DIFF=$DIFF" >> "$GITHUB_ENV"
+
+      - name: Push readme
+        if: env.DIFF != 0
+        run: |
+          git config user.name "$GITHUB_ACTOR" || exit 90
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git add README.md || exit 91
+          export SHA=$GITHUB_SHA || exit 92
+          if [[ -n "$SHA" ]]; then git commit --fixup "$SHA" || exit 93; fi
+          if [[ -z "$SHA" ]]; then git commit -m refresh || exit 94; fi
+          git push || exit 95
+
+
+  parse:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        inst: ${{ fromJson(needs.build.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install poetry
+        run: pip3 install -U pip poetry
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install --without dev
+
+      - name: Pull feed
+        env:
+          INST: ${{ matrix.inst }}
+        run: |
+          git checkout "origin/$INST" -- rss.xml || touch rss.xml
+          mv {rss,old}.xml || exit 10
+
+      - name: Parse feed
+        env:
+          INST: ${{ matrix.inst }}
+        run: poetry run ./parse.py > rss.xml
+
+      - name: Compare feed
+        run: |
+          grep '^<item' old.xml > .old.xml || true
+          grep '^<item' rss.xml > .new.xml || exit 20
+          diff .???.xml && DIFF=0 || DIFF=1
+          echo "DIFF=$DIFF" >> "$GITHUB_ENV"
+
+      - name: Publish feed
+        env:
+          INST: ${{ matrix.inst }}
+        if: env.DIFF != 0
+        run: |
+          git config user.name "$GITHUB_ACTOR" || exit 90
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git branch --delete "$INST" || true
+          git checkout --orphan "$INST" || exit 91
+          git rm --cached -rf . || exit 92
+          git add -f rss.xml || exit 93
+          git commit -m "$(date +%s)" || exit 94
+          git push origin "$INST" --force || exit 95
