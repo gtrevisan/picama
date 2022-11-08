@@ -38,6 +38,22 @@ def link(href, text):
     return f"[{text}]({href})"
 
 
+def badge(name):
+
+    """
+    build a badge
+    :param name: workflow name
+    :return: badge alt, src, href
+    """
+
+    workflow = REPO + f"/actions/workflows/{name}.yml"
+    return (
+        name,
+        workflow + "/badge.svg",
+        workflow,
+    )
+
+
 def main():
 
     """
@@ -46,7 +62,13 @@ def main():
 
     url = "https://pica.cineca.it"
 
-    badges = [
+    badges = [badge(name) for name in ["build", "lint"]]
+    badges += [
+        (
+            "Dependencies: dependabot",
+            "https://badgen.net/badge/Dependabot/enabled/green",
+            "https://dependabot.com",
+        ),
         (
             "Code style: black",
             "https://img.shields.io/badge/code%20style-black-000000.svg",
