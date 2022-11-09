@@ -1,3 +1,6 @@
+
+![logo](images/logo.png)
+
 # PicaMA 🪄
 ### Piattaforma Integrata Concorsi Atenei Magicamente Automatizzata
 
