@@ -121,32 +121,41 @@ def main():
         insts = json.load(fio)
 
     # table headers
-    headers = ["logo", "institution", "Pica", "RSS"]
+    headers = ["logo", "institution", "url", "git", "rss"]
     fillers = ["---"] * len(headers)
     print("|" + "|".join(headers) + "|")
     print("|" + "|".join(fillers) + "|")
 
     # for each institute
     for href, inst in insts.items():
-        pica = "/".join([url, href])
+        pica = "/".join([url, href, ""])
+        branch = REPO + f"/tree/{href}"
         feed = REPO + f"/raw/{href}/rss.xml"
         row = [
-            image(src=url + inst[1], height=64),
+            image(alt=f"logo: {href}", src=url + inst[1], height=64),
             inst[0],
             link(
                 href=pica,
                 text=image(
-                    alt="PICA",
+                    alt=f"url: {href}",
                     src="https://pica.cineca.it/templates/default/logo_base_PICA_trasp.png",
                     height=32,
                 ),
             ),
             link(
+                href=branch,
+                text=image(
+                    alt=f"branch: {href}",
+                    src="http://getdrawings.com/free-icon-bw/git-icon-5.png",
+                    height=28,
+                ),
+            ),
+            link(
                 href=feed,
                 text=image(
-                    alt="RSS",
+                    alt=f"feed: {href}",
                     src="https://upload.wikimedia.org/wikipedia/en/4/43/Feed-icon.svg",
-                    height=32,
+                    height=24,
                 ),
             ),
         ]
