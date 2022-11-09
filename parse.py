@@ -114,7 +114,7 @@ def parse_job(job):
     print("</item>")
 
 
-def fetch(url, headers={}):
+def fetch(url, headers=None):
 
     """
     fetch a remote url, log in if necessary
