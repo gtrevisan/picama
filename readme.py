@@ -66,7 +66,7 @@ def main():
     badges += [
         (
             "Dependencies: dependabot",
-            "https://badgen.net/badge/Dependabot/enabled/green",
+            "https://badgen.net/badge/Dependabot/enabled/green?icon=dependabot",
             "https://dependabot.com",
         ),
         (
