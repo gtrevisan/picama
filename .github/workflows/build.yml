@@ -80,8 +80,9 @@ jobs:
         env:
           INST: ${{ matrix.inst }}
         run: |
-          git checkout "origin/$INST" -- rss.xml || touch rss.xml
-          mv {rss,old}.xml || exit 10
+          git checkout "origin/$INST" -- rss.xml && OLD=0 || OLD=1
+          echo "OLD=$OLD" >> "$GITHUB_ENV"
+          mv {rss,old}.xml || touch old.xml
 
       - name: Parse feed
         env:
@@ -92,8 +93,23 @@ jobs:
         run: |
           grep '^<item' old.xml > .old.xml || true
           grep '^<item' rss.xml > .new.xml || exit 20
-          diff .???.xml && DIFF=0 || DIFF=1
+          diff .{old,new}.xml && DIFF=0 || DIFF=1
           echo "DIFF=$DIFF" >> "$GITHUB_ENV"
+
+      - name: Detach branch
+        env:
+          INST: ${{ matrix.inst }}
+        if: env.DIFF != 0 && env.OLD != 0
+        run: |
+          git checkout --orphan "$INST" || exit 30
+          git rm --cached -rf . || exit 31
+
+      - name: Checkout branch
+        env:
+          INST: ${{ matrix.inst }}
+        if: env.DIFF != 0 && env.OLD == 0
+        run: |
+          git checkout "$INST" || exit 40
 
       - name: Publish feed
         env:
@@ -102,9 +118,6 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR" || exit 90
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git branch --delete "$INST" || true
-          git checkout --orphan "$INST" || exit 91
-          git rm --cached -rf . || exit 92
           git add -f rss.xml || exit 93
           git commit -m "$(date +%s)" || exit 94
           git push origin "$INST" --force || exit 95
