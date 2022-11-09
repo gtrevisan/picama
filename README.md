@@ -3,7 +3,7 @@
 
 [![build](https://github.com/gtrevisan/picama/actions/workflows/build.yml/badge.svg)](https://github.com/gtrevisan/picama/actions/workflows/build.yml)
 [![lint](https://github.com/gtrevisan/picama/actions/workflows/lint.yml/badge.svg)](https://github.com/gtrevisan/picama/actions/workflows/lint.yml)
-[![Dependencies: dependabot](https://badgen.net/badge/Dependabot/enabled/green)](https://dependabot.com)
+[![Dependencies: dependabot](https://badgen.net/badge/Dependabot/enabled/green?icon=dependabot)](https://dependabot.com)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/PyCQA/pylint)
 
