@@ -60,6 +60,8 @@ jobs:
       fail-fast: false
       matrix:
         inst: ${{ fromJson(needs.build.outputs.matrix) }}
+    env:
+      INST: ${{ matrix.inst }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -77,8 +79,6 @@ jobs:
         run: poetry install --without dev
 
       - name: Pull feed
-        env:
-          INST: ${{ matrix.inst }}
         run: |
           git checkout "origin/$INST" -- rss.xml && OLD=0 || OLD=1
           echo "OLD=$OLD" >> "$GITHUB_ENV"
@@ -86,7 +86,6 @@ jobs:
 
       - name: Parse feed
         env:
-          INST: ${{ matrix.inst }}
           SESS: ${{ secrets.SESS }}
         run: poetry run ./parse.py > rss.xml
 
@@ -98,23 +97,17 @@ jobs:
           echo "DIFF=$DIFF" >> "$GITHUB_ENV"
 
       - name: Detach branch
-        env:
-          INST: ${{ matrix.inst }}
         if: env.DIFF != 0 && env.OLD != 0
         run: |
           git checkout --orphan "$INST" || exit 30
           git rm --cached -rf . || exit 31
 
       - name: Checkout branch
-        env:
-          INST: ${{ matrix.inst }}
         if: env.DIFF != 0 && env.OLD == 0
         run: |
           git checkout "$INST" || exit 40
 
       - name: Publish feed
-        env:
-          INST: ${{ matrix.inst }}
         if: env.DIFF != 0
         run: |
           git config user.name "$GITHUB_ACTOR" || exit 90
