@@ -81,6 +81,11 @@ def main():
         ),
     ]
 
+    # logo
+    print()
+    print(image(alt="logo", src="images/logo.png"))
+    print()
+
     # title and subtitle
     print("# PicaMA 🪄")
     print("### Piattaforma Integrata Concorsi Atenei Magicamente Automatizzata")
