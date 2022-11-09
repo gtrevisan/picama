@@ -87,6 +87,7 @@ jobs:
       - name: Parse feed
         env:
           INST: ${{ matrix.inst }}
+          SESS: ${{ secrets.SESS }}
         run: poetry run ./parse.py > rss.xml
 
       - name: Compare feed

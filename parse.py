@@ -114,6 +114,25 @@ def parse_job(job):
     print("</item>")
 
 
+def fetch(url, headers={}):
+
+    """
+    fetch a remote url, log in if necessary
+    :param url: full remote url
+    :param headers: header dictionary
+    :return: requests result
+    """
+
+    print(url, file=sys.stderr, end="\t")
+    result = requests.get(url=url, headers=headers, allow_redirects=False, timeout=9)
+    print(result.status_code, file=sys.stderr)
+
+    if result.status_code == 302 and not headers:
+        return fetch(url=url, headers={"Cookie": os.environ.get("SESS")})
+
+    return result
+
+
 def main():
 
     """
@@ -137,10 +156,8 @@ def main():
     else:
 
         # fetch
-        full = URL + "/" + inst + "/"
-        print(full, file=sys.stderr, end="\t")
-        result = requests.get(full, allow_redirects=False, timeout=9)
-        print(result.status_code, file=sys.stderr)
+        url = URL + "/" + inst + "/"
+        result = fetch(url=url)
 
         # read and cache
         html = result.content
