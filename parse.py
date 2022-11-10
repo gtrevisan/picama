@@ -44,13 +44,14 @@ def parse_old():
 
     # open cache
     with open(old_feed, "r", encoding="utf-8") as fio:
-        soup = bs4.BeautifulSoup(fio, "xml")
+        lines = fio.readlines()
 
     # parse cache
     feed = {}
-    for job in soup.find_all("item"):
-        code = job.find("guid").get_text()
-        feed[code] = job
+    for line in lines:
+        code = re.search(r">([^<>]*)</guid>", line)
+        if code:
+            feed[code.group(1)] = line.strip("\n")
 
     return feed
 
