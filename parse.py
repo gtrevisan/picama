@@ -190,7 +190,7 @@ def main():
     # no jobs
     if not jobs:
         print("<item>", end="")
-        print(tag("guid", "error"))
+        print(tag("guid", "error"), end="")
         print(tag("title", errmsg), end="")
         print(tag("link", repo + "/issues/new"), end="")
         print("</item>")
