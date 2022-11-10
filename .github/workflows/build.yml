@@ -105,11 +105,22 @@ jobs:
         run: |
           git checkout "$INST" || exit 40
 
+      - name: Fetch job url
+        id: fetch-job
+        if: env.DIFF != 0
+        uses: Tiryoh/gha-jobid-action@v0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          job_name: parse (${{ matrix.inst }})
+          per_page: 100
+
       - name: Publish feed
         if: env.DIFF != 0
+        env:
+          URL: ${{ steps.fetch-job.outputs.html_url }}
         run: |
           git config user.name "$GITHUB_ACTOR" || exit 90
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add -f rss.xml || exit 93
-          git commit -m "$(date +%s)" || exit 94
+          git commit -m "$(date +%s)" -m "$URL" || exit 94
           git push origin "$INST" --force || exit 95
