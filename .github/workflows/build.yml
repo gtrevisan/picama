@@ -16,23 +16,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pip3 install -U pip poetry
-
       - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-          cache: 'poetry'
+          cache: 'pip'
 
       - name: Install dependencies
-        run: poetry install --without dev
+        run: pip3 install -r requirements.txt
 
       - name: Build matrix
         id: set-matrix
-        run: poetry run ./matrix.py >> "$GITHUB_OUTPUT"
+        run: ./matrix.py >> "$GITHUB_OUTPUT"
 
       - name: Build readme
-        run: poetry run ./readme.py > README.md
+        run: ./readme.py > README.md
 
       - name: Compare readme
         run: |
@@ -65,16 +62,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install poetry
-        run: pip3 install -U pip poetry
-
       - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-          cache: 'poetry'
+          cache: 'pip'
 
       - name: Install dependencies
-        run: poetry install --without dev
+        run: pip3 install -r requirements.txt
 
       - name: Pull feed
         run: |
@@ -85,7 +79,7 @@ jobs:
       - name: Parse feed
         env:
           SESS: ${{ secrets.SESS }}
-        run: poetry run ./parse.py > rss.xml
+        run: ./parse.py > rss.xml
 
       - name: Compare feed
         run: |
