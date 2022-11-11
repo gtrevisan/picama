@@ -138,7 +138,7 @@ def main():
                 href=pica,
                 text=image(
                     alt=f"url: {href}",
-                    src="https://pica.cineca.it/templates/default/logo_base_PICA_trasp.png",
+                    src="images/pica.png",
                     height=32,
                 ),
             ),
@@ -146,7 +146,7 @@ def main():
                 href=branch,
                 text=image(
                     alt=f"branch: {href}",
-                    src="http://getdrawings.com/free-icon-bw/git-icon-5.png",
+                    src="images/git.png",
                     height=28,
                 ),
             ),
@@ -154,7 +154,7 @@ def main():
                 href=feed,
                 text=image(
                     alt=f"feed: {href}",
-                    src="https://upload.wikimedia.org/wikipedia/en/4/43/Feed-icon.svg",
+                    src="images/feed.svg",
                     height=24,
                 ),
             ),
