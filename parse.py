@@ -8,25 +8,32 @@ parse the webpage of a single institution
 import os
 import re
 import sys
-from datetime import datetime as dt
+from datetime import datetime
+from email.utils import formatdate
 
 # third-party
 import bs4
 import requests
 
 URL = "https://pica.cineca.it"
+REPO = "https://github.com/gtrevisan/picama"
 
 
-def tag(name, content):
+def tag(name, content, attrs=None):
 
     """
     print content enclosed in named tag
     :param name: tag name
     :param content: tag content
+    :param attrs: attributes
     :return: string
     """
 
-    return f"<{name}>{content}</{name}>"
+    attr_str = ""
+    if attrs:
+        attr_str = "".join([f' {key}="{val}"' for key, val in attrs.items()])
+
+    return f"<{name}{attr_str}>{content}</{name}>"
 
 
 def parse_old():
@@ -83,9 +90,8 @@ def parse_job(div):
         begin, until, categ = data
 
     # fetch details
-    link = URL + href
-    print(link, file=sys.stderr, end="\t")
-    result = requests.get(link, timeout=9)
+    print(URL + href, file=sys.stderr, end="\t")
+    result = requests.get(URL + href, timeout=9)
     print(result.status_code, file=sys.stderr)
 
     # parse details
@@ -100,18 +106,22 @@ def parse_job(div):
         descr += "\n"
         descr += "<b>From:</b> " + begin + "\n"
         descr += "<b>To:</b> " + until + "\n"
+        date = formatdate(datetime.strptime(begin, "%d-%m-%Y %H:%M").timestamp())
+    else:
+        date = formatdate()
     if categ:
         descr += "<b>Category:</b> " + categ + "\n"
     if details:
-        descr += str(details)
+        descr += re.sub('href="./', f'href="{URL}{href}', str(details))
+    descr = re.sub(r'href=".?/', f'href="{URL}/', descr)
     descr = descr.replace("\n", "<br/>").replace("<", "&lt;").replace(">", "&gt;")
 
     # build line
     return (
         "<item>"
-        + tag("guid", code)
-        + tag("link", link)
-        + tag("pubDate", begin)
+        + tag("guid", code, attrs={"isPermaLink": "false"})
+        + tag("link", URL + href)
+        + tag("pubDate", date)
         + tag("title", title)
         + tag("description", descr)
         + "</item>"
@@ -143,7 +153,6 @@ def main():
     main function
     """
 
-    repo = "https://github.com/gtrevisan/picama"
     inst = os.environ["INST"]
     html = inst + ".htm"
 
@@ -177,10 +186,10 @@ def main():
         divs = calls.find_all("div", class_="col-xs-12")
         errmsg = None
     elif URL + "/login" in str(content):
-        divs = None
+        divs = []
         errmsg = "Login required"
     elif soup.find("h1").get_text() == "Non ci sono bandi":
-        divs = None
+        divs = []
         errmsg = "No open positions"
 
     # new feed
@@ -191,7 +200,7 @@ def main():
         new_feed["error"] = "<item>"
         new_feed["error"] += tag("guid", "error")
         new_feed["error"] += tag("title", errmsg)
-        new_feed["error"] += tag("link", repo + "/issues/new")
+        new_feed["error"] += tag("link", REPO + "/issues/new")
         new_feed["error"] += "</item>"
 
     # for each job
@@ -206,9 +215,13 @@ def main():
             new_feed[code] = parse_job(div=div)
 
     # build and print feed
-    print('<rss version="2.0"><channel>')
-    print("<title>" + re.sub(r"\s+", " ", soup.title.get_text()).strip() + "</title>")
-    print("<lastBuildDate>" + dt.now().strftime("%c") + "</lastBuildDate>")
+    title = re.sub(r"\s+", " ", soup.title.get_text()).strip()
+    print('<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">')
+    print("<channel>")
+    print(tag("title", title))
+    print(tag("link", f"{REPO}/tree/{inst}"))
+    print(tag("description", title))
+    print(tag("lastBuildDate", formatdate()))
     print("\n".join([new_feed[code] for code in sorted(new_feed)]))
     print("</channel></rss>")
 
