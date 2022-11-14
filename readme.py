@@ -70,6 +70,11 @@ def main():
             "https://dependabot.com",
         ),
         (
+            "Feed: validated",
+            "https://badgen.net/badge/rss/validated/green?icon=rss",
+            f"https://validator.w3.org/feed/check.cgi?url={REPO}/raw/cineca/rss.xml",
+        ),
+        (
             "Code style: black",
             "https://img.shields.io/badge/code%20style-black-000000.svg",
             "https://github.com/psf/black",
