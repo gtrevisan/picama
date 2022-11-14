@@ -5,10 +5,10 @@ parse the webpage of a single institution
 """
 
 # global
-import datetime
 import os
 import re
 import sys
+from datetime import datetime as dt
 
 # third-party
 import bs4
@@ -56,18 +56,20 @@ def parse_old():
     return feed
 
 
-def parse_job(job):
+def parse_job(div):
 
     """
     parse a single job
+    :param div: job div
+    :return: feed line
     """
 
     # parse
-    code = job.find("span", class_="search_cod").get_text()
-    href = job.find("a", class_="card").get("href")
-    title = job.find("h1", class_="search_title").get_text()
-    text = job.find("small", class_="default_call-desc")
-    cdata = job.find("div", class_="default_call-data").find_all("span")
+    code = div.find("span", class_="search_cod").get_text()
+    href = div.find("a", class_="card").get("href")
+    title = div.find("h1", class_="search_title").get_text()
+    text = div.find("small", class_="default_call-desc")
+    cdata = div.find("div", class_="default_call-data").find_all("span")
     data = [val.get_text().strip(" ") for val in cdata]
 
     # parse date
@@ -102,17 +104,18 @@ def parse_job(job):
         descr += "<b>Category:</b> " + categ + "\n"
     if details:
         descr += str(details)
-
     descr = descr.replace("\n", "<br/>").replace("<", "&lt;").replace(">", "&gt;")
 
-    # build feed job
-    print("<item>", end="")
-    print(tag("guid", code), end="")
-    print(tag("link", link), end="")
-    print(tag("pubDate", begin), end="")
-    print(tag("title", title), end="")
-    print(tag("description", descr), end="")
-    print("</item>")
+    # build line
+    return (
+        "<item>"
+        + tag("guid", code)
+        + tag("link", link)
+        + tag("pubDate", begin)
+        + tag("title", title)
+        + tag("description", descr)
+        + "</item>"
+    )
 
 
 def fetch(url, headers=None):
@@ -142,17 +145,17 @@ def main():
 
     repo = "https://github.com/gtrevisan/picama"
     inst = os.environ["INST"]
-    new_html = inst + ".htm"
+    html = inst + ".htm"
 
     # old feed
-    feed = parse_old()
+    old_feed = parse_old()
 
     # check cache
-    if os.path.exists(new_html):
+    if os.path.exists(html):
 
         # read
-        with open(new_html, "rb") as fio:
-            html = fio.read()
+        with open(html, "rb") as fio:
+            content = fio.read()
 
     else:
 
@@ -161,53 +164,52 @@ def main():
         result = fetch(url=url)
 
         # read and cache
-        html = result.content
-        with open(new_html, "wb") as fio:
-            fio.write(html)
+        content = result.content
+        with open(html, "wb") as fio:
+            fio.write(content)
 
     # parse html
-    soup = bs4.BeautifulSoup(html, "html.parser")
+    soup = bs4.BeautifulSoup(content, "html.parser")
     calls = soup.find("div", id="myCalls")
 
     # sanity check
     if calls:
-        jobs = calls.find_all("div", class_="col-xs-12")
+        divs = calls.find_all("div", class_="col-xs-12")
         errmsg = None
-    elif URL + "/login" in str(html):
-        jobs = []
+    elif URL + "/login" in str(content):
+        divs = None
         errmsg = "Login required"
     elif soup.find("h1").get_text() == "Non ci sono bandi":
-        jobs = []
+        divs = None
         errmsg = "No open positions"
 
-    # start building feed
-    print('<rss version="2.0"><channel>')
-    print("<title>" + re.sub(r"\s+", " ", soup.title.get_text()).strip() + "</title>")
-    print(
-        "<lastBuildDate>" + datetime.datetime.now().strftime("%c") + "</lastBuildDate>"
-    )
+    # new feed
+    new_feed = {}
 
     # no jobs
-    if not jobs:
-        print("<item>", end="")
-        print(tag("guid", "error"), end="")
-        print(tag("title", errmsg), end="")
-        print(tag("link", repo + "/issues/new"), end="")
-        print("</item>")
+    if not divs:
+        new_feed["error"] = "<item>"
+        new_feed["error"] += tag("guid", "error")
+        new_feed["error"] += tag("title", errmsg)
+        new_feed["error"] += tag("link", repo + "/issues/new")
+        new_feed["error"] += "</item>"
 
     # for each job
-    for job in jobs:
+    for div in divs:
 
-        code = job.find("span", class_="search_cod").get_text()
+        code = div.find("span", class_="search_cod").get_text()
 
-        # keep cache if present
-        if code in feed:
-            print(feed[code])
-            continue
+        if code in old_feed:
+            new_feed[code] = old_feed[code]
+            print(code, file=sys.stderr)
+        else:
+            new_feed[code] = parse_job(div=div)
 
-        # parse job
-        parse_job(job=job)
-
+    # build and print feed
+    print('<rss version="2.0"><channel>')
+    print("<title>" + re.sub(r"\s+", " ", soup.title.get_text()).strip() + "</title>")
+    print("<lastBuildDate>" + dt.now().strftime("%c") + "</lastBuildDate>")
+    print("\n".join([new_feed[code] for code in sorted(new_feed)]))
     print("</channel></rss>")
 
 
