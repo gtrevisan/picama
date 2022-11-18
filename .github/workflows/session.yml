@@ -1,0 +1,25 @@
+---
+
+name: session
+# yamllint disable-line rule:truthy
+on:
+  schedule:
+    - cron: '45 3,9,15,21 * * *'
+
+jobs:
+
+
+  session:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refresh session
+        env:
+          SESS: ${{ secrets.SESS }}
+        run: |
+          curl "https://pica.cineca.it/miur/" \
+             -i -s -H "Cookie: $SESS"  \
+             -m 30 --retry 3 --retry-delay 60 \
+          | tee out \
+          | head
+          grep "HTTP.*200.*OK" out
+          grep "myCalls" out
