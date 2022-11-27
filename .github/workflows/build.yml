@@ -85,7 +85,8 @@ jobs:
         run: |
           grep '^<item' old.xml > .old.xml || true
           grep '^<item' rss.xml > .new.xml || exit 20
-          diff .{old,new}.xml && DIFF=0 || DIFF=1
+          diff .{old,new}.xml | tee .diff.txt
+          grep -q '^>' .diff.txt && DIFF=1 || DIFF=0
           echo "DIFF=$DIFF" >> "$GITHUB_ENV"
 
       - name: Detach branch
