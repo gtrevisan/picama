@@ -191,12 +191,15 @@ def main():
     elif soup.find("h1").get_text() == "Non ci sono bandi":
         divs = []
         errmsg = "No open positions"
+    else:
+        divs = []
+        errmsg = None
 
     # new feed
     new_feed = {}
 
     # no jobs
-    if not divs:
+    if not divs and errmsg:
         new_feed["error"] = "<item>"
         new_feed["error"] += tag("guid", "error")
         new_feed["error"] += tag("title", errmsg)
