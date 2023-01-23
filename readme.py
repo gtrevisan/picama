@@ -65,11 +65,6 @@ def main():
     badges = [badge(name) for name in ["build", "lint"]]
     badges += [
         (
-            "Dependencies: dependabot",
-            "https://badgen.net/badge/Dependabot/enabled/green?icon=dependabot",
-            "https://dependabot.com",
-        ),
-        (
             "Feed: validated",
             "https://badgen.net/badge/rss/validated/green?icon=rss",
             f"https://validator.w3.org/feed/check.cgi?url={REPO}/raw/cineca/rss.xml",
