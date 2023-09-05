@@ -115,6 +115,7 @@ def parse_job(div):
         descr += re.sub('href="./', f'href="{URL}{href}', str(details))
     descr = re.sub(r'href=".?/', f'href="{URL}/', descr)
     descr = descr.replace("\n", "<br/>").replace("<", "&lt;").replace(">", "&gt;")
+    descr = descr.replace(" & ", " &amp; ")
 
     # build line
     return (
