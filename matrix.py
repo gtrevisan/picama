@@ -12,9 +12,9 @@ import sys
 import requests
 import bs4
 
+
 # main function
 def main():
-
     """
     main function
     """
@@ -46,5 +46,4 @@ def main():
 
 # command-line entry point
 if __name__ == "__main__":
-
     main()

@@ -20,7 +20,6 @@ REPO = "https://github.com/gtrevisan/picama"
 
 
 def tag(name, content, attrs=None):
-
     """
     print content enclosed in named tag
     :param name: tag name
@@ -37,7 +36,6 @@ def tag(name, content, attrs=None):
 
 
 def parse_old():
-
     """
     parse old feed
     :return: dictionary
@@ -64,7 +62,6 @@ def parse_old():
 
 
 def parse_job(div):
-
     """
     parse a single job
     :param div: job div
@@ -130,7 +127,6 @@ def parse_job(div):
 
 
 def fetch(url, headers=None):
-
     """
     fetch a remote url, log in if necessary
     :param url: full remote url
@@ -149,7 +145,6 @@ def fetch(url, headers=None):
 
 
 def main():
-
     """
     main function
     """
@@ -162,13 +157,11 @@ def main():
 
     # check cache
     if os.path.exists(html):
-
         # read
         with open(html, "rb") as fio:
             content = fio.read()
 
     else:
-
         # fetch
         url = URL + "/" + inst + "/"
         result = fetch(url=url)
@@ -209,7 +202,6 @@ def main():
 
     # for each job
     for div in divs:
-
         code = div.find("span", class_="search_cod").get_text()
 
         if code in old_feed:
@@ -232,5 +224,4 @@ def main():
 
 # command-line entry point
 if __name__ == "__main__":
-
     main()

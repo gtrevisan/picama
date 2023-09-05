@@ -11,7 +11,6 @@ REPO = "https://github.com/gtrevisan/picama"
 
 
 def image(src, alt="", height=None):
-
     """
     build an image string
     :param src: image src
@@ -27,7 +26,6 @@ def image(src, alt="", height=None):
 
 
 def link(href, text):
-
     """
     build a hyperlink
     :param href: link href
@@ -39,7 +37,6 @@ def link(href, text):
 
 
 def badge(name):
-
     """
     build a badge
     :param name: workflow name
@@ -55,7 +52,6 @@ def badge(name):
 
 
 def main():
-
     """
     main function
     """
@@ -164,5 +160,4 @@ def main():
 
 # command-line entry point
 if __name__ == "__main__":
-
     main()
