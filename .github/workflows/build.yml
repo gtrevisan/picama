@@ -15,6 +15,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
       - uses: actions/setup-python@v4
         with:
@@ -36,13 +38,27 @@ jobs:
           git diff --quiet --exit-code README.md && DIFF=0 || DIFF=1
           echo "DIFF=$DIFF" >> "$GITHUB_ENV"
 
+      - name: Fetch job url
+        id: fetch-job
+        if: env.DIFF != 0
+        uses: Tiryoh/gha-jobid-action@v0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          job_name: build
+
       - name: Push readme
         if: env.DIFF != 0
+        env:
+          URL: ${{ steps.fetch-job.outputs.html_url }}
         run: |
           git config user.name "$GITHUB_ACTOR" || exit 90
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          ADDED=$(git diff --unified=0 README.md \
+            | grep -o 'branch: [a-z]*' \
+            | cut -d ' ' -f2 \
+            | xargs)
           git add README.md || exit 91
-          git commit -m readme || exit 92
+          git commit -m "added: ${ADDED:-something}" -m "$URL" || exit 92
           git push || exit 93
 
 
