@@ -56,6 +56,7 @@ jobs:
           ADDED=$(git diff --unified=0 README.md \
             | grep -o 'branch: [a-z]*' \
             | cut -d ' ' -f2 \
+            | sort -u \
             | xargs)
           git add README.md || exit 91
           git commit -m "added: ${ADDED:-something}" -m "$URL" || exit 92
