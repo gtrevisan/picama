@@ -45,6 +45,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           job_name: build
+          per_page: 100
 
       - name: Push readme
         if: env.DIFF != 0
