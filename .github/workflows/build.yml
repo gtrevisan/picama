@@ -125,6 +125,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           job_name: parse (${{ matrix.inst }})
           per_page: 100
+        continue-on-error: true
 
       - name: Publish feed
         if: env.DIFF != 0
