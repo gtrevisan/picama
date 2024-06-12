@@ -41,7 +41,7 @@ jobs:
       - name: Fetch job url
         id: fetch-job
         if: env.DIFF != 0
-        uses: Tiryoh/gha-jobid-action@v1
+        uses: Tiryoh/gha-jobid-action@v1.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           job_name: build
@@ -120,7 +120,7 @@ jobs:
       - name: Fetch job url
         id: fetch-job
         if: env.DIFF != 0
-        uses: Tiryoh/gha-jobid-action@v1
+        uses: Tiryoh/gha-jobid-action@v1.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           job_name: parse (${{ matrix.inst }})
