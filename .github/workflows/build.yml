@@ -41,9 +41,8 @@ jobs:
       - name: Fetch job url
         id: fetch-job
         if: env.DIFF != 0
-        uses: Tiryoh/gha-jobid-action@v1.3
+        uses: Tiryoh/gha-jobid-action@v1.4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           job_name: build
           per_page: 100
         continue-on-error: true
@@ -120,9 +119,8 @@ jobs:
       - name: Fetch job url
         id: fetch-job
         if: env.DIFF != 0
-        uses: Tiryoh/gha-jobid-action@v1.3
+        uses: Tiryoh/gha-jobid-action@v1.4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           job_name: parse (${{ matrix.inst }})
           per_page: 100
         continue-on-error: true
