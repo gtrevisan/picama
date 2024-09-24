@@ -44,7 +44,8 @@ jobs:
       - name: Fetch job url
         id: fetch-job
         if: env.DIFF != 0
-        uses: Tiryoh/gha-jobid-action@be260d8673c9211a84cdcf37794ebd654ba81eef # v1.4.0
+        # v1.4.0
+        uses: Tiryoh/gha-jobid-action@be260d8673c9211a84cdcf37794ebd654ba81eef
         with:
           job_name: build
           per_page: 100
@@ -125,7 +126,8 @@ jobs:
       - name: Fetch job url
         id: fetch-job
         if: env.DIFF != 0
-        uses: Tiryoh/gha-jobid-action@be260d8673c9211a84cdcf37794ebd654ba81eef # v1.4.0
+        # v1.4.0
+        uses: Tiryoh/gha-jobid-action@be260d8673c9211a84cdcf37794ebd654ba81eef
         with:
           job_name: parse (${{ matrix.inst }})
           per_page: 100
