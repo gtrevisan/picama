@@ -13,16 +13,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
-          cache: 'pip'
+          python-version-file: 'pyproject.toml'
+          cache: 'poetry'
 
       - name: Install dependencies
-        run: pip3 install -r requirements.txt -r requirements-dev.txt
+        run: poetry install
 
       - name: Run Pylint
-        run: pylint *.py
+        run: poetry run pylint *.py
 
 
   black:
@@ -42,12 +46,12 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version-file: 'pyproject.toml'
 
-      - name: Install yamllint
-        run: pip3 install yamllint
+      - name: Install dependencies
+        run: poetry install
 
       - name: Run yamllint
         run: |
           find "$PWD" -type f -name '*.yml' \
-          | xargs yamllint
+          | xargs poetry run yamllint
