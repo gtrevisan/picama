@@ -176,15 +176,15 @@ def main():
     calls = soup.find("div", id="myCalls")
 
     # sanity checks
-    if soup.find("h1").get_text() == "Non ci sono bandi":
+    if URL + "/login" in str(content):
+        divs = []
+        errmsg = "Login required"
+    elif soup.find("h1").get_text() == "Non ci sono bandi":
         divs = []
         errmsg = "No open positions"
     elif calls:
         divs = calls.find_all("div", class_="col-xs-12")
         errmsg = None
-    elif URL + "/login" in str(content):
-        divs = []
-        errmsg = "Login required"
     else:
         divs = []
         errmsg = None
