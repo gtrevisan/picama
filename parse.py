@@ -35,6 +35,22 @@ def tag(name, content, attrs=None):
     return f"<{name}{attr_str}>{content}</{name}>"
 
 
+def replace(string):
+    """
+    replace some special characters
+    :return: string
+    """
+    for old, new in [
+        ("\n", "<br/>"),
+        ("<", "&lt;"),
+        (">", "&gt;"),
+        (" & ", " &amp; "),
+        ("–", "-"),
+    ]:
+        string = string.replace(old, new)
+    return string
+
+
 def parse_old():
     """
     parse old feed
@@ -111,8 +127,6 @@ def parse_job(div):
     if details:
         descr += re.sub('href="./', f'href="{URL}{href}', str(details))
     descr = re.sub(r'href=".?/', f'href="{URL}/', descr)
-    descr = descr.replace("\n", "<br/>").replace("<", "&lt;").replace(">", "&gt;")
-    descr = descr.replace(" & ", " &amp; ")
 
     # build line
     return (
@@ -120,8 +134,8 @@ def parse_job(div):
         + tag("guid", code, attrs={"isPermaLink": "false"})
         + tag("link", URL + href)
         + tag("pubDate", date)
-        + tag("title", title)
-        + tag("description", descr)
+        + tag("title", replace(title))
+        + tag("description", replace(descr))
         + "</item>"
     )
 
