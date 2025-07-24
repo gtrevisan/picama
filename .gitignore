@@ -2,3 +2,5 @@
 *.json
 *.htm
 *.xml
+.venv
+__pycache__
