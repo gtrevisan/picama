@@ -18,23 +18,21 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - uses: actions/setup-python@v5
         with:
           python-version-file: 'pyproject.toml'
-          cache: 'poetry'
+
+      - uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
-        run: poetry install
+        run: uv sync
 
       - name: Build matrix
         id: set-matrix
-        run: poetry run ./matrix.py >> "$GITHUB_OUTPUT"
+        run: uv run matrix >> "$GITHUB_OUTPUT"
 
       - name: Build readme
-        run: poetry run ./readme.py > README.md
+        run: uv run readme > README.md
 
       - name: Compare readme
         run: |
@@ -82,16 +80,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - uses: actions/setup-python@v5
         with:
           python-version-file: 'pyproject.toml'
-          cache: 'poetry'
+
+      - uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
-        run: poetry install
+        run: uv sync
 
       - name: Pull feed
         run: |
@@ -102,7 +98,7 @@ jobs:
       - name: Parse feed
         env:
           SESS: ${{ secrets.SESS }}
-        run: poetry run ./parse.py > rss.xml
+        run: uv run parse > rss.xml
 
       - name: Compare feed
         run: |
