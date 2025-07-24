@@ -9,8 +9,8 @@ import json
 import sys
 
 # third-party
-import requests
 import bs4
+import requests
 
 
 # main function
