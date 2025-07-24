@@ -26,7 +26,7 @@ jobs:
         run: poetry install
 
       - name: Run Pylint
-        run: poetry run pylint *.py
+        run: poetry run pylint picama
 
 
   black:
@@ -37,6 +37,27 @@ jobs:
       - uses: psf/black@stable
         with:
           options: "--check --verbose"
+
+
+  isort:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: 'pyproject.toml'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Run isort
+        run: poetry run isort picama
 
 
   yaml:
