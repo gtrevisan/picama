@@ -13,20 +13,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version-file: 'pyproject.toml'
-          cache: 'poetry'
+
+      - uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
-        run: poetry install
+        run: uv sync
 
-      - name: Run Pylint
-        run: poetry run pylint picama
+      - name: Run pylint
+        run: uv run pylint picama
 
 
   black:
@@ -34,9 +31,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: psf/black@stable
+      - uses: actions/setup-python@v5
         with:
-          options: "--check --verbose"
+          python-version-file: 'pyproject.toml'
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run black
+        run: uv run black picama
 
 
   isort:
@@ -44,20 +49,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version-file: 'pyproject.toml'
-          cache: 'poetry'
+
+      - uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
-        run: poetry install
+        run: uv sync
 
       - name: Run isort
-        run: poetry run isort picama
+        run: uv run isort picama
 
 
   yaml:
@@ -65,17 +67,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - uses: actions/setup-python@v5
         with:
           python-version-file: 'pyproject.toml'
 
+      - uses: astral-sh/setup-uv@v6
+
       - name: Install dependencies
-        run: poetry install
+        run: uv sync
 
       - name: Run yamllint
         run: |
           find "$PWD" -type f -name '*.yml' \
-          | xargs poetry run yamllint
+          | xargs uv run yamllint
