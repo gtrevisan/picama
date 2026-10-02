@@ -201,7 +201,7 @@ def main():
         errmsg = None
     else:
         divs = []
-        errmsg = None
+        errmsg = "Unexpected layout"
 
     # new feed
     new_feed = {}
